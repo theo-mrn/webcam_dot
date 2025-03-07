@@ -1,34 +1,57 @@
 "use client"
 
 import type React from "react"
-import { useRef, useEffect, useState } from "react"
+import { useRef, useEffect, useState, useCallback } from "react"
 import Webcam from "react-webcam"
 
 const WebcamCircles: React.FC = () => {
   const webcamRef = useRef<Webcam>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [isVideoReady, setIsVideoReady] = useState(false)
+  const [dotsCount, setDotsCount] = useState(50) // Nombre de points sur la largeur
 
-  useEffect(() => {
-    let animationFrameId: number
+  const processImageData = (imageData: ImageData, ctx: CanvasRenderingContext2D) => {
+    const { width, height, data } = imageData
+    ctx.fillStyle = "black"
+    ctx.fillRect(0, 0, width, height)
 
-    const processFrame = () => {
-      captureAndProcess()
-      animationFrameId = requestAnimationFrame(processFrame)
-    }
+    // Calculer l'espacement en fonction de la largeur et du nombre de points souhaité
+    const spacing = Math.floor(width / dotsCount)
+    // La taille du cercle est proportionnelle à l'espacement
+    const circleSize = spacing * 0.8
 
-    if (isVideoReady) {
-      processFrame()
-    }
+    for (let y = spacing/2; y < height; y += spacing) {
+      for (let x = spacing/2; x < width; x += spacing) {
+        // Calculer la moyenne des pixels dans la zone du point
+        let avgBrightness = 0
+        let count = 0
+        
+        // Échantillonner la zone autour du point
+        for (let sy = -spacing/4; sy < spacing/4; sy++) {
+          for (let sx = -spacing/4; sx < spacing/4; sx++) {
+            const sampleX = Math.floor(x + sx)
+            const sampleY = Math.floor(y + sy)
+            if (sampleX >= 0 && sampleX < width && sampleY >= 0 && sampleY < height) {
+              const i = (sampleY * width + sampleX) * 4
+              const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3
+              avgBrightness += brightness
+              count++
+            }
+          }
+        }
+        
+        avgBrightness = avgBrightness / count
+        const radius = (avgBrightness / 255) * (circleSize / 2)
 
-    return () => {
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId)
+        ctx.beginPath()
+        ctx.arc(x, y, radius, 0, Math.PI * 2)
+        ctx.fillStyle = "white"
+        ctx.fill()
       }
     }
-  }, [isVideoReady])
+  }
 
-  const captureAndProcess = () => {
+  const captureAndProcess = useCallback(() => {
     const webcam = webcamRef.current
     const canvas = canvasRef.current
 
@@ -47,29 +70,26 @@ const WebcamCircles: React.FC = () => {
         }
       }
     }
-  }
+  }, [dotsCount])
 
-  const processImageData = (imageData: ImageData, ctx: CanvasRenderingContext2D) => {
-    const { width, height, data } = imageData
-    ctx.fillStyle = "black"
-    ctx.fillRect(0, 0, width, height)
+  useEffect(() => {
+    let animationFrameId: number
 
-    const circleSize = 10
-    const spacing = 12
+    const processFrame = () => {
+      captureAndProcess()
+      animationFrameId = requestAnimationFrame(processFrame)
+    }
 
-    for (let y = 0; y < height; y += spacing) {
-      for (let x = 0; x < width; x += spacing) {
-        const i = (y * width + x) * 4
-        const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3
-        const radius = (brightness / 255) * (circleSize / 2)
+    if (isVideoReady) {
+      processFrame()
+    }
 
-        ctx.beginPath()
-        ctx.arc(x, y, radius, 0, Math.PI * 2)
-        ctx.fillStyle = "white"
-        ctx.fill()
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId)
       }
     }
-  }
+  }, [isVideoReady, captureAndProcess])
 
   const handleVideoReady = () => {
     setIsVideoReady(true)
@@ -84,6 +104,18 @@ const WebcamCircles: React.FC = () => {
         onLoadedMetadata={handleVideoReady}
       />
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full object-cover" />
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 p-4 rounded-lg">
+        <label className="text-white mr-2">Nombre de points:</label>
+        <input
+          type="range"
+          min="10"
+          max="200"
+          value={dotsCount}
+          onChange={(e) => setDotsCount(Number(e.target.value))}
+          className="w-48"
+        />
+        <span className="text-white ml-2">{dotsCount}</span>
+      </div>
     </div>
   )
 }
