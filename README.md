@@ -1,37 +1,130 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Webcam DOT
 
-## Getting Started
+Une application web interactive qui transforme votre flux webcam en temps réel en un effet artistique de pointillisme (halftone). La taille de chaque point varie dynamiquement en fonction de la luminosité de l'image capturée.
 
-First, run the development server:
+## ✨ Fonctionnalités
 
+- **Effet pointillisme en temps réel** : Transforme le flux vidéo de votre webcam en une grille de cercles
+- **Contrôle interactif** : Ajustez le nombre de points de 10 à 200 via un slider
+- **Performance optimisée** : Utilise `requestAnimationFrame` pour un rendu fluide
+- **Responsive** : S'adapte à toutes les tailles d'écran
+
+## 🎨 Comment ça marche ?
+
+L'application capture le flux vidéo de votre webcam et analyse la luminosité de chaque zone de l'image. Plus une zone est lumineuse, plus le cercle correspondant sera grand. Les zones sombres génèrent des petits cercles, créant ainsi un effet de demi-teinte (halftone).
+
+## 🚀 Installation
+
+### Prérequis
+
+- Node.js (version 20 ou supérieure)
+- npm, yarn, pnpm ou bun
+
+### Étapes
+
+1. Clonez le dépôt :
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/votre-username/webcam_dot.git
+cd webcam_dot
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Installez les dépendances :
+```bash
+npm install
+# ou
+yarn install
+# ou
+pnpm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Lancez le serveur de développement :
+```bash
+npm run dev
+# ou
+yarn dev
+# ou
+pnpm dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Ouvrez [http://localhost:3000](http://localhost:3000) dans votre navigateur
 
-## Learn More
+**Note** : Votre navigateur vous demandera l'autorisation d'accéder à votre webcam.
 
-To learn more about Next.js, take a look at the following resources:
+## 🛠️ Technologies utilisées
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **[Next.js 15](https://nextjs.org/)** - Framework React avec App Router
+- **[React 19](https://react.dev/)** - Bibliothèque UI
+- **[TypeScript](https://www.typescriptlang.org/)** - Typage statique
+- **[Tailwind CSS 4](https://tailwindcss.com/)** - Framework CSS utilitaire
+- **[react-webcam](https://www.npmjs.com/package/react-webcam)** - Gestion de la webcam
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📝 Utilisation
 
-## Deploy on Vercel
+1. Autorisez l'accès à votre webcam lorsque le navigateur vous le demande
+2. Utilisez le slider en bas de l'écran pour ajuster le nombre de points
+   - **Moins de points** (10-30) : Effet plus abstrait et pixelisé
+   - **Plus de points** (100-200) : Plus de détails et de précision
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🏗️ Structure du projet
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# webcam_dot
+```
+webcam_dot/
+├── src/
+│   └── app/
+│       ├── page.tsx           # Page principale
+│       ├── WebcamCircles.tsx  # Composant principal avec la logique
+│       ├── layout.tsx         # Layout de l'application
+│       └── globals.css        # Styles globaux
+├── public/                    # Assets statiques
+├── package.json              # Dépendances et scripts
+└── README.md                 # Ce fichier
+```
+
+## 🎯 Scripts disponibles
+
+```bash
+npm run dev      # Lance le serveur de développement
+npm run build    # Compile l'application pour la production
+npm run start    # Lance le serveur de production
+npm run lint     # Vérifie le code avec ESLint
+```
+
+## 🚀 Déploiement
+
+L'application peut être facilement déployée sur [Vercel](https://vercel.com) :
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/votre-username/webcam_dot)
+
+Ou suivez la [documentation de déploiement Next.js](https://nextjs.org/docs/app/building-your-application/deploying).
+
+## 🔧 Personnalisation
+
+### Modifier la couleur des points
+
+Dans `WebcamCircles.tsx`, modifiez la ligne :
+```typescript
+ctx.fillStyle = "white" // Changez "white" par une autre couleur
+```
+
+### Modifier la couleur de fond
+
+Dans `WebcamCircles.tsx`, modifiez la ligne :
+```typescript
+ctx.fillStyle = "black" // Changez "black" par une autre couleur
+```
+
+### Ajuster la taille des cercles
+
+Modifiez le coefficient dans la ligne :
+```typescript
+const circleSize = spacing * 0.8 // Changez 0.8 pour ajuster la taille
+```
+
+## 📄 Licence
+
+Ce projet est libre d'utilisation pour vos projets personnels et commerciaux.
+
+## 👨‍💻 Auteur
+
+Créé avec ❤️ par Theo
+
